@@ -6,8 +6,10 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import RenderHtml from 'react-native-render-html';
 import { fetchRecipeById } from '../api/wordpress';
 import { Recipe, RootStackParamList } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -18,11 +20,22 @@ import { colors, spacing, fontSizes, borderRadius } from '../constants/theme';
 
 type Route = RouteProp<RootStackParamList, 'RecipeDetail'>;
 
+const htmlTagStyles = {
+  h1: { fontSize: fontSizes.xxl, fontWeight: '800' as const, color: colors.text, marginBottom: spacing.sm },
+  h2: { fontSize: fontSizes.xl, fontWeight: '700' as const, color: colors.text, marginBottom: spacing.sm },
+  h3: { fontSize: fontSizes.lg, fontWeight: '700' as const, color: colors.text },
+  p:  { fontSize: fontSizes.md, color: colors.text, lineHeight: 26, marginBottom: spacing.sm },
+  li: { fontSize: fontSizes.md, color: colors.text, lineHeight: 24 },
+  strong: { fontWeight: '700' as const, color: colors.text },
+  a:  { color: colors.primary },
+};
+
 export default function RecipeDetailScreen() {
   const route = useRoute<Route>();
   const navigation = useNavigation();
   const { recipeId } = route.params;
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { width } = useWindowDimensions();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +69,7 @@ export default function RecipeDetailScreen() {
     </View>
   );
 
-  const cleanContent = stripHtml(recipe.content);
+  const contentWidth = width - spacing.md * 2;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -87,7 +100,13 @@ export default function RecipeDetailScreen() {
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>{i18n.t('recipe.recipe')}</Text>
-        <Text style={styles.recipeContent}>{cleanContent}</Text>
+
+        <RenderHtml
+          contentWidth={contentWidth}
+          source={{ html: recipe.content }}
+          tagsStyles={htmlTagStyles}
+          enableExperimentalMarginCollapsing
+        />
       </View>
     </ScrollView>
   );
@@ -112,21 +131,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
-  date: {
-    fontSize: fontSizes.sm,
-    color: colors.textLight,
-  },
+  date: { fontSize: fontSizes.sm, color: colors.textLight },
   tag: {
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
     borderRadius: borderRadius.full,
   },
-  tagText: {
-    fontSize: fontSizes.xs,
-    color: colors.white,
-    fontWeight: '600',
-  },
+  tagText: { fontSize: fontSizes.xs, color: colors.white, fontWeight: '600' },
   excerpt: {
     fontSize: fontSizes.md,
     color: colors.textLight,
@@ -144,11 +156,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: spacing.md,
-  },
-  recipeContent: {
-    fontSize: fontSizes.md,
-    color: colors.text,
-    lineHeight: 26,
   },
   error: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   errorText: { fontSize: fontSizes.md, color: colors.textLight },

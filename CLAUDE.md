@@ -40,3 +40,5 @@ All design tokens (colors, spacing, font sizes, border radii) live in `src/const
 ### WordPress content
 
 Recipe titles, excerpts, and content come as raw HTML from WordPress. Always pass them through `stripHtml()` from `src/utils/htmlParser.ts` before rendering in `Text` components.
+
+The full recipe body (`recipe.content`) is rendered using `react-native-render-html` in `RecipeDetailScreen` — do not use `stripHtml()` for the body, pass the raw HTML directly via the `source={{ html }}` prop. Tag styles are defined inline in the screen via `htmlTagStyles`.
