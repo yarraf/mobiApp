@@ -1,4 +1,4 @@
-# Smakidnia Mobile App
+# Mobile App
 
 Application mobile pour le site de recettes polonaises [smakidnia.pl](https://smakidnia.pl) — *Przepisy Na Każdą Okazję* (Recettes pour chaque occasion).
 
