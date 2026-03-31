@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, Image } from 'react-native';
 import { RootStackParamList, TabParamList } from '../types';
 import HomeScreen from '../screens/HomeScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
@@ -51,7 +51,21 @@ function MainTabs({ locale, onOpenLangPicker }: { locale: Locale; onOpenLangPick
         ),
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: i18n.t('tabs.home') }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          headerStyle: { backgroundColor: colors.card },
+          headerTitle: () => (
+            <Image
+              source={require('../../assets/logo.webp')}
+              style={{ width: 110, height: 34 }}
+              resizeMode="contain"
+            />
+          ),
+          headerTitleContainerStyle: { justifyContent: 'center', alignItems: 'center' },
+        }}
+      />
       <Tab.Screen name="Categories" component={CategoriesScreen} options={{ title: i18n.t('tabs.categories') }} />
       <Tab.Screen name="Search" component={SearchScreen} options={{ title: i18n.t('tabs.search') }} />
       <Tab.Screen name="Favorites" component={FavoritesScreen} options={{ title: i18n.t('tabs.favorites') }} />

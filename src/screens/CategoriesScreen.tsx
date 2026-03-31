@@ -74,10 +74,11 @@ export default function CategoriesScreen() {
       >
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{selectedCategory?.name}</Text>
-            <TouchableOpacity onPress={() => setSelectedCategory(null)}>
-              <Text style={styles.closeBtn}>✕</Text>
+            <TouchableOpacity style={styles.backBtn} onPress={() => setSelectedCategory(null)}>
+              <Text style={styles.backArrow}>‹</Text>
+              <Text style={styles.backLabel}>Retour</Text>
             </TouchableOpacity>
+            <Text style={styles.modalTitle}>{selectedCategory?.name}</Text>
           </View>
 
           {loadingRecipes ? (
@@ -143,20 +144,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: spacing.md,
-    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xl * 2,
+    paddingBottom: spacing.md,
     backgroundColor: colors.card,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    minHeight: 80,
   },
   modalTitle: {
-    fontSize: fontSizes.xl,
+    fontSize: fontSizes.lg,
     fontWeight: '800',
     color: colors.text,
+    flex: 1,
+    textAlign: 'center',
+    marginRight: spacing.xl + spacing.md,
   },
-  closeBtn: {
-    fontSize: fontSizes.lg,
-    color: colors.textLight,
-    padding: spacing.xs,
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  backArrow: {
+    fontSize: 28,
+    color: colors.primary,
+    lineHeight: 30,
+  },
+  backLabel: {
+    fontSize: fontSizes.md,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });
