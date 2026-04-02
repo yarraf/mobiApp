@@ -42,16 +42,21 @@ jobs:
         working-directory: android
         run: ./gradlew assembleRelease bundleRelease
 
+      - name: List APK files
+        run: ls -la android/app/build/outputs/apk/release/
+
       - name: Sign APK
         run: |
           BUILD_TOOLS=$(ls $ANDROID_SDK_ROOT/build-tools/ | sort -V | tail -1)
+          APK_FILE=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          echo "Signing: $APK_FILE"
           $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/apksigner sign \
             --ks android/app/smakidnia.keystore \
             --ks-key-alias ${{ secrets.KEY_ALIAS }} \
             --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
             --key-pass pass:${{ secrets.KEY_PASSWORD }} \
             --out android/app/build/outputs/apk/release/smakidnia-signed.apk \
-            android/app/build/outputs/apk/release/app-release-unsigned.apk
+            $APK_FILE
 
       - name: Sign AAB
         run: |
