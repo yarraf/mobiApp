@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK & AAB
 
 on:
   push:
@@ -38,29 +38,41 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/smakidnia.keystore
 
-      - name: Build APK
+      - name: Build APK + AAB
         working-directory: android
-        run: ./gradlew assembleRelease
-        env:
-          KEYSTORE_PATH: app/smakidnia.keystore
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease bundleRelease
 
       - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
+        run: |
+          BUILD_TOOLS=$(ls $ANDROID_SDK_ROOT/build-tools/ | sort -V | tail -1)
+          $ANDROID_SDK_ROOT/build-tools/$BUILD_TOOLS/apksigner sign \
+            --ks android/app/smakidnia.keystore \
+            --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --out android/app/build/outputs/apk/release/smakidnia-signed.apk \
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Sign AAB
+        run: |
+          jarsigner -verbose \
+            -keystore android/app/smakidnia.keystore \
+            -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+            -keypass ${{ secrets.KEY_PASSWORD }} \
+            -signedjar android/app/build/outputs/bundle/release/smakidnia-signed.aab \
+            android/app/build/outputs/bundle/release/app-release.aab \
+            ${{ secrets.KEY_ALIAS }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: smakidnia-release.apk
-          path: android/app/build/outputs/apk/release/*.apk
+          name: smakidnia-release-apk
+          path: android/app/build/outputs/apk/release/smakidnia-signed.apk
+          retention-days: 30
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: smakidnia-release-aab
+          path: android/app/build/outputs/bundle/release/smakidnia-signed.aab
           retention-days: 30
