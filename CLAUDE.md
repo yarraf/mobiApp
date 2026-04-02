@@ -9,6 +9,7 @@ npm start          # Start Expo dev server (scan QR with Expo Go)
 npm run android    # Start with Android emulator
 npm run ios        # Start with iOS simulator (macOS only)
 npm run web        # Start in browser
+npx expo start --lan --clear   # LAN mode (same WiFi, no VPN)
 ```
 
 No linter or test runner is configured yet.
@@ -42,3 +43,35 @@ All design tokens (colors, spacing, font sizes, border radii) live in `src/const
 Recipe titles, excerpts, and content come as raw HTML from WordPress. Always pass them through `stripHtml()` from `src/utils/htmlParser.ts` before rendering in `Text` components.
 
 The full recipe body (`recipe.content`) is rendered using `react-native-render-html` in `RecipeDetailScreen` — do not use `stripHtml()` for the body, pass the raw HTML directly via the `source={{ html }}` prop. Tag styles are defined inline in the screen via `htmlTagStyles`.
+
+### Internationalisation
+
+3 langues : Polonais (défaut), Français, Anglais. Fichiers de traduction dans `src/i18n/`. Toujours utiliser `i18n.t('clé')` pour les textes UI — ne jamais hardcoder du texte en dur dans les composants. La langue est persistée via AsyncStorage et chargée au démarrage dans `App.tsx`.
+
+## Branch strategy
+
+```
+main          ← code stable, production
+develop       ← développement général
+android-dev   ← build & config Android (déclenche GitHub Actions)
+ios-dev       ← build & config iOS (à venir)
+```
+
+## Android Build (GitHub Actions)
+
+Le workflow `.github/workflows/build-android.yml` se déclenche sur push vers `android-dev`.
+
+Il génère 2 artifacts :
+- `smakidnia-release-apk` — APK signé pour installation directe
+- `smakidnia-release-aab` — AAB signé pour Google Play Store
+
+**Secrets GitHub requis** (`Settings → Secrets → Actions`) :
+
+| Secret | Description |
+|---|---|
+| `KEYSTORE_BASE64` | Keystore encodé en base64 |
+| `KEYSTORE_PASSWORD` | Mot de passe du keystore |
+| `KEY_ALIAS` | `smakidnia` |
+| `KEY_PASSWORD` | Mot de passe de la clé |
+
+Le keystore `smakidnia.keystore` est exclu du repo via `.gitignore` — ne jamais le commiter.
