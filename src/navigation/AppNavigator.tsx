@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, TouchableOpacity, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { RootStackParamList, TabParamList } from '../types';
 import HomeScreen from '../screens/HomeScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
@@ -18,15 +19,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Home: '🏠',
+  const color = focused ? colors.primary : colors.textLight;
+
+  if (name === 'Home') {
+    return <MaterialCommunityIcons name="pot-steam" size={26} color={color} />;
+  }
+
+  const emojis: Record<string, string> = {
     Categories: '📂',
     Search: '🔍',
     Favorites: '❤️',
   };
   return (
     <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>
-      {icons[name] ?? '●'}
+      {emojis[name] ?? '●'}
     </Text>
   );
 }
