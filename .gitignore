@@ -17,6 +17,9 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+*.keystore
+keystore_base64.txt
+
 
 # Metro
 .metro-health-check*
